@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col justify-between">
+
+    <nav class="bg-blue-600 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                <span class="text-xl font-bold tracking-tight uppercase">{{ title }}</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                {% if current_user.is_authenticated %}
+                <span class="text-sm">Xin chào, {{ current_user.username }}!</span>
+                <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">Đăng xuất</a>
+                {% else %}
+                <a href="/register" class="hover:text-blue-200 font-medium text-sm">Đăng ký</a>
+                <a href="/login" class="bg-blue-800 hover:bg-blue-900 px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Đăng nhập
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+        
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Kho tài liệu chia sẻ</h2>
+                <p class="text-xs text-gray-400">Yêu cầu nâng cao: Tính năng Upload File tài liệu</p>
+            </div>
+            <a href="/upload" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm flex items-center space-x-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Thêm tài liệu mới</span>
+            </a>
+        </div>
+                <form method="GET" action="/" class="mb-6 flex gap-2">
+                    <input type="text" name="q" placeholder="Nhập tên tài liệu cần tìm..."
+                        class="flex-1 border rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <button type="submit" class="bg-slate-800 text-white px-6 py-2 rounded-xl font-semibold hover:bg-black transition">
+                        Tìm kiếm
+                    </button>
+                    <a href="/" class="bg-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 transition">Reset</a>
+                </form>
+
+        <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase border-b border-gray-100">
+                            <th class="px-6 py-4">Mã số</th>
+                            <th class="px-6 py-4">Tên tài liệu</th>
+                            <th class="px-6 py-4">Người đăng / Quyền</th>
+                            <th class="px-6 py-4">Định dạng</th>
+                            <th class="px-6 py-4 text-right">Thao tác hệ thống</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm text-gray-600">
+                        {% for doc in documents %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="px-6 py-4 font-bold text-gray-900">#00{{ doc.id }}</td>
+                            <td class="px-6 py-4 font-medium text-blue-600 hover:underline cursor-pointer">{{ doc.original_name }}</td>
+                            <td class="px-6 py-4">
+                                <p class="text-gray-800 font-medium">{{ doc.owner.username }}</p>
+                                <td class="px-6 py-4 text-sm uppercase font-bold text-blue-600">{{ doc.file_type }}</td>
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">Sinh viên</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-md">{{ doc.file_type }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <a href="{{ url_for('static', filename='uploads/' + doc.filename) }}" download
+                                    class="text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                        <i class="fa-solid fa-download mr-1"></i>Tải
+                                </a>
+                                <a href="{{ url_for('edit_file', id=doc.id) }}"
+                                    class="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                        <i class="fa-solid fa-pen-to-square mr-1"></i>Sửa 
+                                </a>
+                                </button>
+                                <a href="{{ url_for('delete_file', id=doc.id) }}"
+                                    class="text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                        <i class="fa-solid fa-trash mr-1"></i>Xóa
+                                </a>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        </tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 italic">
+                                chưa có tài liệu dc đăng trên hệ thống
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50/50 border-t flex justify-between items-center text-xs text-gray-500">
+                <span>Hiển thị 1-2 trong số nhiều tài liệu từ SQLite</span>
+                <div class="flex space-x-1">
+                    <button class="px-3 py-1 bg-white border rounded hover:bg-gray-100 transition disabled:opacity-50" disabled>Trước</button>
+                    <button class="px-3 py-1 bg-blue-600 text-white border rounded font-bold">1</button>
+                    <button class="px-3 py-1 bg-white border rounded hover:bg-gray-100 transition">Sau</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t py-6 bg-white text-center text-xs text-gray-400">
+        &copy; 2026 - Đồ án cấu trúc Flask chuẩn chỉnh (routes, templates, static, models)
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa tài liệu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-10">
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-sm border">
+        <h2 class="text-xl font-bold mb-6 text-gray-800">Sửa tên tài liệu</h2>
+        <form method="POST">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tên tài liệu mới:</label>
+            <input type="text" name="new_name" value="{{ doc.original_name }}" 
+                   class="w-full border rounded-xl px-4 py-2 mb-6 focus:ring-2 focus:ring-blue-500 outline-none" required>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-semibold transition">
+                    Lưu thay đổi
+                </button>
+                <a href="/" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-xl font-semibold transition">
+                    Hủy
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
