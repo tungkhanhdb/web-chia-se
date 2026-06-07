@@ -118,17 +118,16 @@ def register():
 @login_required
 def upload_file():
     if request.method == 'POST':
-        if 'file' not in request.files:
+        files = request.files.getlist('files')
+        if 'files' not in request.files:
             return "Không thấy file nào!"
-        
-        file = request.files['file']
-        
-        if file.filename == '':
-            return "Chưa chọn file!"
-            
-        if file:
+        if not files or (len(files) == 1 and files[0].filename == ''): # Kiểm tra điều kiện về file
+            return "Chưa chọn file nào cả!"
+        for file in files:
+            if file and file.filename != '':
+            # Lưu file
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-            #lưu thông tin vô data base
+            # Lưu thông tin vô cái db
             new_doc = Document(
                 filename=file.filename,         # Tên file lưu trên server
                 original_name=file.filename,    # tên file gốc
