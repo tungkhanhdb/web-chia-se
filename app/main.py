@@ -126,7 +126,7 @@ def upload_file():
         for file in files:
             if file and file.filename != '':
             # Lưu file
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+               file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
             # Lưu thông tin vô cái db
             new_doc = Document(
                 filename=file.filename,         # Tên file lưu trên server
