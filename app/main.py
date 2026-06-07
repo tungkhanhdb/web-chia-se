@@ -135,10 +135,10 @@ def upload_file():
                 user_id=current_user.id        
             )
             db.session.add(new_doc)
-            db.session.commit() # lưu vào db
+        db.session.commit() # lưu vào db
             
             # Sau khi upload xong, chuyển hướng về trang chủ
-            return redirect(url_for('index'))
+        return redirect(url_for('index'))
             
     # ĐÂY LÀ DÒNG BẮT BUỘC (cũng như các dòng bên trên): Hiển thị form khi người dùng vào bằng phương thức GET
     return render_template('upload.html')
