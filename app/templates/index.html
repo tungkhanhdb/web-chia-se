@@ -42,8 +42,8 @@
             </a>
         </div>
                 <form method="GET" action="/" class="mb-6 flex gap-2">
-                    <input type="text" name="q" placeholder="Nhập tên tài liệu cần tìm..."
-                        class="flex-1 border rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input 
+                    type="text" name="q" value="{{ request.args.get('q', '')}}"placeholder="Nhập tên tài liệu hoặc loại file (pdf, docx, xlsx...) cần tìm..."class="flex-1 border rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
                     <button type="submit" class="bg-slate-800 text-white px-6 py-2 rounded-xl font-semibold hover:bg-black transition">
                         Tìm kiếm
                     </button>
@@ -68,12 +68,15 @@
                             <td class="px-6 py-4 font-bold text-gray-900">#00{{ doc.id }}</td>
                             <td class="px-6 py-4 font-medium text-blue-600 hover:underline cursor-pointer">{{ doc.original_name }}</td>
                             <td class="px-6 py-4">
-                                <p class="text-gray-800 font-medium">{{ doc.owner.username }}</p>
-                                <td class="px-6 py-4 text-sm uppercase font-bold text-blue-600">{{ doc.file_type }}</td>
-                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">Sinh viên</span>
+                                 <p class="text-gray-800 font-medium">{{ doc.owner.username }}</p>
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-semibold">
+                                Sinh viên
+                                </span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-md">{{ doc.file_type }}</span>
+                                <span class="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-md">
+                                {{ doc.file_type }}
+                             </span>
                             </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 <a href="{{ url_for('static', filename='uploads/' + doc.filename) }}" download
@@ -83,17 +86,16 @@
                                 <a href="{{ url_for('edit_file', id=doc.id) }}"
                                     class="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
                                         <i class="fa-solid fa-pen-to-square mr-1"></i>Sửa 
-                                </a>
-                                </button>
+                                </a>                                
                                 <a href="{{ url_for('delete_file', id=doc.id) }}"
                                     class="text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
                                         <i class="fa-solid fa-trash mr-1"></i>Xóa
                                 </a>
-                                </button>
+                                
                             </td>
                         </tr>
                         {% else %}
-                        </tr>
+                        <tr>
                             <td colspan="5" class="px-6 py-4 text-center text-gray-500 italic">
                                 chưa có tài liệu dc đăng trên hệ thống
                             </td>

@@ -4,6 +4,7 @@ from flask_login import login_required
 from flask_login import logout_user
 from flask_login import current_user
 import os
+from sqlalchemy import or_
 
 app = Flask(__name__)
 from flask_login import LoginManager, login_user
@@ -47,7 +48,13 @@ def index():
     search_query = request.args.get('q')
     if search_query:
         # Nếu có từ khóa, lọc tên file chứa từ khóa đó (không phân biệt hoa thường với .ilike)
-        all_docs = Document.query.filter(Document.original_name.ilike(f'%{search_query}%')).all()
+        all_docs = Document.query.filter(
+            or_(
+                Document.original_name.ilike(f'%{search_query}%'),
+                Document.file_type.ilike(f'%{search_query}%')
+            )
+        ).all()
+        
     else:
 # Lấy toàn bộ tài liệu từ Database để hiển thị
         all_docs = Document.query.all()
@@ -159,6 +166,11 @@ def delete_file(id):
 @login_required
 def edit_file(id):
     doc = Document.query.get_or_404(id)
+
+    if doc.user_id != current_user.id:
+        flash("Bạn không có quyền sửa tài liệu này!")
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         # Cập nhật tên mới từ form
         doc.original_name = request.form.get('new_name')
