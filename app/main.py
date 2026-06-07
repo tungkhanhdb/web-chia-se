@@ -152,6 +152,9 @@ def delete_file(id):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
     if os.path.exists(file_path):
         os.remove(file_path)
+    if doc.user_id != current_user.id:
+        flash("Không được quyền xóa tài liệu!")
+        return redirect(url_for('index'))
     # Xóa record trong database
     db.session.delete(doc)
     db.session.commit()
