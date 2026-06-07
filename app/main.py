@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
-from models import db, User, Document # Import cái "quản gia" db từ file models.py mình vừa tạo; đảm bảo import cả 'User' từ file models.py
+from models import db, User, Document # Import db từ file models.py mình tạo và cả User từ file models.py
 from flask_login import login_required
 from flask_login import logout_user
 from flask_login import current_user
@@ -18,8 +18,6 @@ from models import User
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# Cấu hình địa chỉ cho cái "két sắt" database
 
 import os
 # Đường dẫn thư mục uploads
