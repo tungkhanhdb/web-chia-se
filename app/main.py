@@ -95,7 +95,6 @@ def register():
         if not user_name or not pass_word:
             return "Yêu cầu nhập đúng thông tin!"
 
-<<<<<<< HEAD
         # 3. Tạo hồ sơ mới từ cái khuôn User ở models.py
         hashed_password = generate_password_hash(pass_word)
 
@@ -105,10 +104,6 @@ def register():
             role='user'
 )
         # 4. Lưu vào két (Database)
-=======
-        new_user = User(username=user_name, password=pass_word)
-        
->>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -151,7 +146,6 @@ def upload_file():
 @app.route('/delete/<int:id>')
 @login_required
 def delete_file(id):
-<<<<<<< HEAD
     doc = Document.query.get_or_404(id) # Tìm file trong DB
 
     #nếu không phải admin thì chỉ được xóa file của mình
@@ -167,7 +161,7 @@ def delete_file(id):
         os.remove(file_path)
 
     # Xóa record trong database
-=======
+
     doc = Document.query.get_or_404(id) 
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
     if os.path.exists(file_path):
@@ -175,7 +169,6 @@ def delete_file(id):
     if doc.user_id != current_user.id:
         flash("Không được quyền xóa tài liệu!")
         return redirect(url_for('index'))
->>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
     db.session.delete(doc)
     db.session.commit()
 
@@ -188,13 +181,8 @@ def delete_file(id):
 def edit_file(id):
     doc = Document.query.get_or_404(id)
 
-<<<<<<< HEAD
     if current_user.role != 'admin' and doc.user_id != current_user.id:
         flash("Bạn không có quyền sửa tài liệu này!")
-=======
-    if doc.user_id != current_user.id:
-        flash("Không có quyền sửa tài liệu này!")
->>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
         return redirect(url_for('index'))
 
     if request.method == 'POST':
