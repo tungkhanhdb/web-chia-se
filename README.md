@@ -62,6 +62,23 @@ pip install flask flask-sqlalchemy flask-login
 
 ---
 
+**4. Chọn Python Interpreter trong VS Code**
+
+- Bước 1: Bấm `Ctrl + Shift + P` để mở **Command Palette**
+  (hoặc bấm vào biểu tượng bánh răng ở góc dưới bên trái và chọn **Command Palette**).
+
+- Bước 2: Trên thanh tìm kiếm, nhập:
+
+```text
+Python: Select Interpreter
+```
+
+- Bước 3: Chọn phiên bản Python có dạng:
+
+```text
+venv
+```
+
 ## ▶️ Chạy Ứng Dụng
 
 ```bash
