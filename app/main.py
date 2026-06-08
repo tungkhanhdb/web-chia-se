@@ -158,7 +158,7 @@ def upload_file():
 @app.route('/delete/<int:id>')
 @login_required
 def delete_file(id):
-    doc = Document.query.get_or_404(id) # Tìm file trong DB
+    doc = Document.query.get_or_404(id) 
 
     #nếu không phải admin thì chỉ được xóa file của mình
     if current_user.role != 'admin' and doc.user_id != current_user.id:
