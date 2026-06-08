@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
-from models import db, User, Document # Import db từ file models.py mình tạo và cả User từ file models.py
+from models import db, User, Document 
 from flask_login import login_required
 from flask_login import logout_user
 from flask_login import current_user
@@ -15,16 +15,14 @@ from flask_login import LoginManager, login_user
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login' # Nếu chưa đăng nhập thì đẩy về trang login
+login_manager.login_view = 'login' 
 
-# Cái này để Flask-Login biết cách tìm User từ Database
 from models import User
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 import os
-# Đường dẫn thư mục uploads
 UPLOAD_FOLDER = 'app/static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -38,7 +36,6 @@ app.config['SECRET_KEY'] = 'bi-mat-cua-Admin' # Mã bảo mật
 # Khởi tạo database
 db.init_app(app)
 
-# Tạo file database.db lần đầu tiên
 with app.app_context():
     db.create_all()
 
@@ -46,10 +43,8 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    # Lấy từ khóa 'q' từ URL (ví dụ: /?q=bai_tap)
     search_query = request.args.get('q')
     if search_query:
-        # Nếu có từ khóa, lọc tên file chứa từ khóa đó (không phân biệt hoa thường với .ilike)
         all_docs = Document.query.filter(
             or_(
                 Document.original_name.ilike(f'%{search_query}%'),
@@ -58,9 +53,7 @@ def index():
         ).all()
         
     else:
-# Lấy toàn bộ tài liệu từ Database để hiển thị
         all_docs = Document.query.all()
-# --- truyền cả title và documents vào index ---
     return render_template('index.html', title='HỆ THỐNG CHIA SẺ TÀI LIỆU', documents=all_docs, current_user=current_user)
 
 # --- Hàm login (đăng nhập) ---
@@ -71,8 +64,8 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         print(f"Debug: Username nhận được là {username}, Password là {password}")
-
-        # 2. "Lục kho": Tìm user trong database xem có khớp không
+       
+        # 2. Kiểm tra xem username có tồn tại hay chưa
         user = User.query.filter_by(username=username).first()
 
         # 3. Kiểm tra mật khẩu
@@ -96,14 +89,13 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 1. Lấy dữ liệu từ form (tên name trong HTML phải khớp với ở đây)
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
         
-        # 2. Kiểm tra xem người dùng có bỏ trống không
         if not user_name or not pass_word:
             return "Yêu cầu nhập đúng thông tin!"
 
+<<<<<<< HEAD
         # 3. Tạo hồ sơ mới từ cái khuôn User ở models.py
         hashed_password = generate_password_hash(pass_word)
 
@@ -113,6 +105,10 @@ def register():
             role='user'
 )
         # 4. Lưu vào két (Database)
+=======
+        new_user = User(username=user_name, password=pass_word)
+        
+>>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -135,28 +131,27 @@ def upload_file():
             return "Chưa chọn file nào cả!"
         for file in files:
             if file and file.filename != '':
-            # Lưu file
+            
                file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-            # Lưu thông tin vô cái db
+
             new_doc = Document(
-                filename=file.filename,         # Tên file lưu trên server
-                original_name=file.filename,    # tên file gốc
-                file_type=file.filename.split('.')[-1], # Lấy phần đuôi mở rộng (pdf, jpg...)
+                filename=file.filename,         
+                original_name=file.filename,
+                file_type=file.filename.split('.')[-1], 
                 user_id=current_user.id        
             )
             db.session.add(new_doc)
         db.session.commit() # lưu vào db
             
-            # Sau khi upload xong, chuyển hướng về trang chủ
         return redirect(url_for('index'))
             
-    # ĐÂY LÀ DÒNG BẮT BUỘC (cũng như các dòng bên trên): Hiển thị form khi người dùng vào bằng phương thức GET
     return render_template('upload.html')
 
 # --- Hàm xóa ---
 @app.route('/delete/<int:id>')
 @login_required
 def delete_file(id):
+<<<<<<< HEAD
     doc = Document.query.get_or_404(id) # Tìm file trong DB
 
     #nếu không phải admin thì chỉ được xóa file của mình
@@ -172,6 +167,15 @@ def delete_file(id):
         os.remove(file_path)
 
     # Xóa record trong database
+=======
+    doc = Document.query.get_or_404(id) 
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    if doc.user_id != current_user.id:
+        flash("Không được quyền xóa tài liệu!")
+        return redirect(url_for('index'))
+>>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
     db.session.delete(doc)
     db.session.commit()
 
@@ -184,8 +188,13 @@ def delete_file(id):
 def edit_file(id):
     doc = Document.query.get_or_404(id)
 
+<<<<<<< HEAD
     if current_user.role != 'admin' and doc.user_id != current_user.id:
         flash("Bạn không có quyền sửa tài liệu này!")
+=======
+    if doc.user_id != current_user.id:
+        flash("Không có quyền sửa tài liệu này!")
+>>>>>>> 9527637642c83d9749bbc95f1956391f1e73d3f8
         return redirect(url_for('index'))
 
     if request.method == 'POST':
