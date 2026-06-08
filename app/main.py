@@ -38,6 +38,18 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
+with app.app_context():
+    admin = User.query.filter_by(username='admin').first()
+
+    if not admin:
+        admin = User(
+            username='admin',
+            password=generate_password_hash('000000'),
+            role='admin'
+        )
+
+        db.session.add(admin)
+        db.session.commit()
 
 # --- Các đường dẫn (Routes) ---
 
@@ -153,22 +165,13 @@ def delete_file(id):
         flash ("bạn không có quyền xóa")
         return redirect(url_for('index'))
 
-
-
     # Xóa file vật lý trên server (nếu muốn)
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
     if os.path.exists(file_path):
         os.remove(file_path)
 
     # Xóa record trong database
-
-    doc = Document.query.get_or_404(id) 
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    if doc.user_id != current_user.id:
-        flash("Không được quyền xóa tài liệu!")
-        return redirect(url_for('index'))
+    
     db.session.delete(doc)
     db.session.commit()
 
