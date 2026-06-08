@@ -5,6 +5,10 @@ from flask_login import logout_user
 from flask_login import current_user
 import os
 from sqlalchemy import or_
+from werkzeug.security import generate_password_hash, check_password_hash
+
+hashed_password = generate_password_hash("000000")
+print(hashed_password)
 
 app = Flask(__name__)
 from flask_login import LoginManager, login_user
@@ -72,8 +76,9 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         # 3. Kiểm tra mật khẩu
-        if user and user.password == password:
+        if user and check_password_hash(user.password, password):
             login_user(user) # nó sẽ tạo session cho user 
+
             flash(f"Chào mừng trở lại, {user.username}!")
             return redirect(url_for('index'))
         else:
@@ -100,8 +105,13 @@ def register():
             return "Yêu cầu nhập đúng thông tin!"
 
         # 3. Tạo hồ sơ mới từ cái khuôn User ở models.py
-        new_user = User(username=user_name, password=pass_word)
-        
+        hashed_password = generate_password_hash(pass_word)
+
+        new_user = User(
+            username=user_name,
+            password=hashed_password,
+            role='user'
+)
         # 4. Lưu vào két (Database)
         try:
             db.session.add(new_user)
@@ -148,13 +158,23 @@ def upload_file():
 @login_required
 def delete_file(id):
     doc = Document.query.get_or_404(id) # Tìm file trong DB
+
+    #nếu không phải admin thì chỉ được xóa file của mình
+    if current_user.role != 'admin' and doc.user_id != current_user.id:
+        flash ("bạn không có quyền xóa")
+        return redirect(url_for('index'))
+
+
+
     # Xóa file vật lý trên server (nếu muốn)
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], doc.filename)
     if os.path.exists(file_path):
         os.remove(file_path)
+
     # Xóa record trong database
     db.session.delete(doc)
     db.session.commit()
+
     flash("Đã xóa tài liệu!")
     return redirect(url_for('index'))
 
@@ -164,7 +184,7 @@ def delete_file(id):
 def edit_file(id):
     doc = Document.query.get_or_404(id)
 
-    if doc.user_id != current_user.id:
+    if current_user.role != 'admin' and doc.user_id != current_user.id:
         flash("Bạn không có quyền sửa tài liệu này!")
         return redirect(url_for('index'))
 
